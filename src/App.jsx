@@ -180,7 +180,9 @@ function App() {
                         )}
                         onClick={() => (j === 6 || j === 8 || j === 9) && handleSort(j)}
                       >
-                        <div className="flex items-center justify-center">
+                        <div className={classNames(
+                          j < 4 ? "flex items-center justify-start" : "flex items-center justify-center"
+                        )}>
                           {cell}
                           {(j === 6 || j === 8 || j === 9) && (
                             <span className="ml-2">
