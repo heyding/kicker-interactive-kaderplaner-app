@@ -187,9 +187,11 @@ function App() {
                             ? 'sticky top-0 z-10 border-b border-gray-300 bg-white/80 py-3.5 px-3 text-left text-sm font-semibold text-gray-900 backdrop-blur'
                             : 'sticky top-0 z-10 border-b border-gray-300 bg-white/80 py-3.5 px-3 text-center text-sm font-semibold text-gray-900 backdrop-blur',
                           j >= 6 && j <= 8 ? 'bg-yellow-100' : '',
-                          (j === 6 || j === 8 || j === 9) ? 'cursor-pointer hover:bg-gray-100' : ''
+                          (j === 6 || j === 8 || j === 9) ? 'cursor-pointer hover:bg-gray-100' : '',
+                          j === 6 ? 'relative' : ''
                         )}
                         onClick={() => (j === 6 || j === 8 || j === 9) && handleSort(j)}
+                        title={j === 6 ? "Vorhersage der Gesamtpunkte in Kicker Interactive wenn der Spieler 34 Einsätze absolvieren würde." : j === 7 ? "Die Grundlage für die Berechnung der Vorhersage und der Performance sind immer 34 Spieltage. Wenn ein Spieler weniger Spiele macht wird das ignoriert, da in Kicker Interactive nur die Gesamtpunkte zählen." : j === 9 ? "Verhältnis der Vorhersage zu den tatsächlichen Gesamtpunkten (1 = Spieler ist genau im Soll)." : undefined}
                       >
                         <div className={classNames(
                           j < 4 ? "flex items-center justify-start" : "flex items-center justify-center"
@@ -249,6 +251,7 @@ function App() {
                           j === 6 ? 'cursor-pointer hover:bg-gray-100' : ''
                         )}
                         onClick={() => j === 6 && handleSort(j)}
+                        title={j === 6 ? "Vorhersage der Gesamtpunkte in Kicker Interactive wenn der Spieler 34 Einsätze absolvieren würde." : undefined}
                       >
                         <div className={classNames(
                           j < 4 ? "flex items-center justify-start" : "flex items-center justify-center"
