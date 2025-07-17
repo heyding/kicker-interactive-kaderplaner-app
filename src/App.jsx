@@ -80,7 +80,7 @@ function App() {
     <>
       <div className="mt-8 flex flex-col gap-6">
         {/* Filter Container */}
-        <div className="bg-white rounded-xl shadow pt-2 pb-4 px-4 max-w-4xl w-full mx-auto mb-2">
+        <div className="bg-white rounded-xl shadow pt-2 pb-4 px-4 max-w-4xl w-full mx-auto mb-6">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
             <div className="text-xs text-gray-500 font-medium mb-1 sm:mb-0">
               {filteredCount} Spieler entsprechen den aktuellen Kriterien
