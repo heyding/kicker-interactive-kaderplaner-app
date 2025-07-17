@@ -9,6 +9,13 @@ const FILTERS = [
   'FORWARD',
 ]
 
+const POSITION_TRANSLATIONS = {
+  'GOALKEEPER': 'Tor',
+  'DEFENDER': 'Abwehr',
+  'MIDFIELDER': 'Mittelfeld',
+  'FORWARD': 'Sturm'
+}
+
 function App() {
   const [count, setCount] = useState(0)
   const [sheetData, setSheetData] = useState([])
@@ -98,7 +105,7 @@ function App() {
                     aria-pressed={activeFilter === filter}
                     onClick={() => setActiveFilter(filter)}
                   >
-                    {filter.charAt(0) + filter.slice(1).toLowerCase()}
+                    {POSITION_TRANSLATIONS[filter]}
                   </button>
                 ))}
               </span>
@@ -179,7 +186,7 @@ function App() {
                           j >= 6 && j <= 8 ? 'bg-yellow-50' : ''
                         )}
                       >
-                        {cell}
+                        {j === 3 ? POSITION_TRANSLATIONS[cell] || cell : cell}
                       </td>
                     ))}
                   </tr>
