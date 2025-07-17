@@ -114,7 +114,7 @@ function App() {
                 step="1"
                 value={minPrediction}
                 onChange={e => setMinPrediction(Number(e.target.value))}
-                className="w-full sm:w-48 accent-blue-600"
+                className="w-full sm:w-48 accent-red-600"
               />
             </div>
             <div className="w-full sm:w-auto flex-1 flex flex-col sm:flex-row sm:items-center gap-2">
