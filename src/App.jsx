@@ -24,6 +24,8 @@ function App() {
   const [activeFilter, setActiveFilter] = useState('FORWARD')
   const [minPrediction, setMinPrediction] = useState(150)
   const [maxMarketValue, setMaxMarketValue] = useState(5)
+  const [sortColumn, setSortColumn] = useState(6) // Standard: Spalte 7 (Index 6)
+  const [sortDirection, setSortDirection] = useState('desc') // 'asc' oder 'desc'
 
   useEffect(() => {
     setLoading(true)
@@ -64,12 +66,12 @@ function App() {
             );
           })
           .sort((a, b) => {
-            const aVal = parseFloat((a[6] || '').toString().replace(',', '.'));
-            const bVal = parseFloat((b[6] || '').toString().replace(',', '.'));
+            const aVal = parseFloat((a[sortColumn] || '').toString().replace(',', '.'));
+            const bVal = parseFloat((b[sortColumn] || '').toString().replace(',', '.'));
             if (isNaN(aVal) && isNaN(bVal)) return 0;
             if (isNaN(aVal)) return 1;
             if (isNaN(bVal)) return -1;
-            return bVal - aVal;
+            return sortDirection === 'asc' ? aVal - bVal : bVal - aVal;
           })
       ]
     : sheetData
@@ -80,6 +82,16 @@ function App() {
   // Hilfsfunktion für dynamische Klassen
   function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
+  }
+
+  // Funktion zum Sortieren der Tabelle
+  const handleSort = (columnIndex) => {
+    if (sortColumn === columnIndex) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortColumn(columnIndex)
+      setSortDirection('desc')
+    }
   }
 
   return (
@@ -163,10 +175,23 @@ function App() {
                           j < 4
                             ? 'sticky top-0 z-10 border-b border-gray-300 bg-white/80 py-3.5 px-3 text-left text-sm font-semibold text-gray-900 backdrop-blur'
                             : 'sticky top-0 z-10 border-b border-gray-300 bg-white/80 py-3.5 px-3 text-center text-sm font-semibold text-gray-900 backdrop-blur',
-                          j >= 6 && j <= 8 ? 'bg-yellow-100' : ''
+                          j >= 6 && j <= 8 ? 'bg-yellow-100' : '',
+                          (j === 6 || j === 8 || j === 9) ? 'cursor-pointer hover:bg-gray-100' : ''
                         )}
+                        onClick={() => (j === 6 || j === 8 || j === 9) && handleSort(j)}
                       >
-                        {cell}
+                        <div className="flex items-center justify-center">
+                          {cell}
+                          {(j === 6 || j === 8 || j === 9) && (
+                            <span className="ml-2">
+                              {sortColumn === j ? (
+                                sortDirection === 'asc' ? '↑' : '↓'
+                              ) : (
+                                '↕'
+                              )}
+                            </span>
+                          )}
+                        </div>
                       </th>
                     ))}
                   </tr>
