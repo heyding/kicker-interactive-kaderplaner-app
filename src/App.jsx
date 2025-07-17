@@ -96,7 +96,7 @@ function App() {
 
   return (
     <div className="font-sans bg-gray-50 min-h-screen">
-      <main className="mt-8 flex flex-col gap-6 items-center">
+      <main className="pt-8 flex flex-col gap-6 items-center">
         {/* Filter Container */}
         <section className="bg-white rounded-2xl shadow-lg pt-4 pb-6 px-6 max-w-7xl w-full mx-auto mb-8 border border-gray-200">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
@@ -124,7 +124,7 @@ function App() {
             </div>
             <div className="w-full sm:w-auto flex-1 flex flex-col sm:flex-row sm:items-center gap-2">
               <label className="text-sm font-medium text-gray-700 w-full sm:w-auto">
-                Min. Punktevorhersage: <span className="font-bold">{minPrediction}</span>
+                Min. Punkte (Vorhersage): <span className="font-bold">{minPrediction}</span>
               </label>
               <input
                 type="range"
