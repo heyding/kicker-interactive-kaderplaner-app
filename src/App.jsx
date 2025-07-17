@@ -169,7 +169,7 @@ function App() {
         </div>
         
         {/* Table Container */}
-        <section className="bg-white rounded-2xl shadow-lg pt-4 pb-6 px-6 max-w-7xl w-full mx-auto border border-gray-200">
+        <section className="bg-white rounded-2xl shadow-lg pt-4 pb-8 px-6 max-w-7xl w-full mx-auto border border-gray-200 mb-8">
           {loading && <div className="text-blue-500">Lade Daten...</div>}
           {error && <div className="text-red-500">Fehler: {error}</div>}
           <div className="overflow-x-auto">
