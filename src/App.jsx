@@ -79,7 +79,7 @@ function App() {
     <div className="font-sans bg-gray-50 min-h-screen">
       <main className="mt-8 flex flex-col gap-6 items-center">
         {/* Filter Container */}
-        <section className="bg-white rounded-2xl shadow-lg pt-4 pb-6 px-6 max-w-4xl w-full mx-auto mb-8 border border-gray-200">
+        <section className="bg-white rounded-2xl shadow-lg pt-4 pb-6 px-6 max-w-7xl w-full mx-auto mb-8 border border-gray-200">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
             <div className="text-xs text-gray-500 font-medium mb-1 sm:mb-0">
               {filteredCount} Spieler entsprechen den aktuellen Kriterien
@@ -137,7 +137,7 @@ function App() {
           </div>
         </section>
         {/* Table Container */}
-        <section className="bg-white rounded-2xl shadow-lg pt-4 pb-6 px-6 max-w-4xl w-full mx-auto border border-gray-200">
+        <section className="bg-white rounded-2xl shadow-lg pt-4 pb-6 px-6 max-w-7xl w-full mx-auto border border-gray-200">
           {loading && <div className="text-blue-500">Lade Daten...</div>}
           {error && <div className="text-red-500">Fehler: {error}</div>}
           <div className="overflow-x-auto">
