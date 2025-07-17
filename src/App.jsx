@@ -42,21 +42,29 @@ function App() {
       .finally(() => setLoading(false))
   }, [])
 
-  // Filtered data: skip header row, filter by position (Spalte 4, index 3),
-  // market value (Spalte 5, index 4), prediction (Spalte 7, index 6)
+  // Immer nach Vorhersage (Spalte 6) absteigend sortieren
   const filteredData = Array.isArray(sheetData) && sheetData.length > 1
     ? [
         sheetData[0],
-        ...sheetData.slice(1).filter(row => {
-          const position = row[3]?.toUpperCase()
-          const marketValue = parseFloat(row[4]?.replace(',', '.') || 0)
-          const prediction = parseFloat(row[6]?.replace(',', '.') || 0)
-          return (
-            position === activeFilter &&
-            prediction >= minPrediction &&
-            marketValue <= maxMarketValue
-          )
-        })
+        ...sheetData.slice(1)
+          .filter(row => {
+            const position = row[3]?.toUpperCase();
+            const marketValue = parseFloat(row[4]?.replace(',', '.') || 0);
+            const prediction = parseFloat(row[6]?.replace(',', '.') || 0);
+            return (
+              position === activeFilter &&
+              prediction >= minPrediction &&
+              marketValue <= maxMarketValue
+            );
+          })
+          .sort((a, b) => {
+            const aVal = parseFloat((a[6] || '').toString().replace(',', '.'));
+            const bVal = parseFloat((b[6] || '').toString().replace(',', '.'));
+            if (isNaN(aVal) && isNaN(bVal)) return 0;
+            if (isNaN(aVal)) return 1;
+            if (isNaN(bVal)) return -1;
+            return bVal - aVal;
+          })
       ]
     : sheetData
 
