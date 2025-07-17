@@ -1,6 +1,6 @@
-const defaultTheme = require('tailwindcss/defaultTheme')
+import { fontFamily } from 'tailwindcss/defaultTheme'
 
-module.exports = {
+export default {
   content: [
     "./index.html",
     "./src/**/*.{js,jsx,ts,tsx}",
@@ -8,7 +8,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['InterVariable', ...defaultTheme.fontFamily.sans],
+        sans: ['InterVariable', ...fontFamily.sans],
       },
     },
   },
