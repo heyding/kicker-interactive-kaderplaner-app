@@ -60,12 +60,17 @@ function App() {
       ]
     : sheetData
 
+  // Anzahl der Spieler, die den Filterkriterien entsprechen (ohne Header)
+  const filteredCount = Array.isArray(filteredData) && filteredData.length > 1 ? filteredData.length - 1 : 0;
   return (
     <>
       <div className="mt-8 flex flex-col gap-6">
         {/* Filter Container */}
         <div className="bg-white rounded-xl shadow pt-2 pb-4 px-4 max-w-4xl w-full mx-auto mb-2">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-4">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+            <div className="text-xs text-gray-500 font-medium mb-1 sm:mb-0">
+              {filteredCount} Spieler entsprechen den aktuellen Kriterien
+            </div>
             <div className="w-full max-w-full sm:w-auto sm:max-w-none flex-1">
               <span className="isolate flex w-full max-w-full sm:inline-flex rounded-md shadow-xs">
                 {FILTERS.map((filter, idx) => (
