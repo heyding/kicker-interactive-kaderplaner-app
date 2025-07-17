@@ -77,28 +77,29 @@ function App() {
   }
 
   return (
-    <>
-      <div className="mt-8 flex flex-col gap-6">
+    <div className="font-sans bg-gray-50 min-h-screen">
+      <main className="mt-8 flex flex-col gap-6 items-center">
         {/* Filter Container */}
-        <div className="bg-white rounded-xl shadow pt-2 pb-4 px-4 max-w-4xl w-full mx-auto mb-6">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+        <section className="bg-white rounded-2xl shadow-lg pt-4 pb-6 px-6 max-w-4xl w-full mx-auto mb-8 border border-gray-200">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
             <div className="text-xs text-gray-500 font-medium mb-1 sm:mb-0">
               {filteredCount} Spieler entsprechen den aktuellen Kriterien
             </div>
-            <div className="w-full max-w-full sm:w-auto sm:max-w-none flex-1">
-              <span className="isolate flex w-full max-w-full sm:inline-flex rounded-md shadow-xs">
+            <div className="w-full sm:w-auto flex-1">
+              <span className="isolate inline-flex rounded-md shadow-sm">
                 {FILTERS.map((filter, idx) => (
                   <button
                     key={filter}
                     type="button"
-                    className={
-                      `relative inline-flex items-center justify-center w-full max-w-full sm:w-auto sm:max-w-none px-3 py-2 text-sm font-semibold ring-1 ring-gray-300 ring-inset focus:z-10 ` +
-                      (idx === 0 ? 'rounded-l-md ' : '-ml-px ')
-                      + (idx === FILTERS.length - 1 ? 'rounded-r-md ' : '')
-                      + (activeFilter === filter
-                          ? 'bg-red-600 text-white'
-                          : 'bg-white text-gray-900 hover:bg-gray-50')
-                    }
+                    className={classNames(
+                      'relative inline-flex items-center px-4 py-2 text-sm font-medium ring-1 ring-inset ring-gray-300 focus:z-10 transition-colors',
+                      idx === 0 ? 'rounded-l-md' : '-ml-px',
+                      idx === FILTERS.length - 1 ? 'rounded-r-md' : '',
+                      activeFilter === filter
+                        ? 'bg-red-600 text-white hover:bg-red-700'
+                        : 'bg-white text-gray-900 hover:bg-gray-50'
+                    )}
+                    aria-pressed={activeFilter === filter}
                     onClick={() => setActiveFilter(filter)}
                   >
                     {filter.charAt(0) + filter.slice(1).toLowerCase()}
@@ -106,7 +107,7 @@ function App() {
                 ))}
               </span>
             </div>
-            <div className="w-full max-w-full sm:w-auto sm:max-w-none flex-1 flex flex-col sm:flex-row sm:items-center gap-2">
+            <div className="w-full sm:w-auto flex-1 flex flex-col sm:flex-row sm:items-center gap-2">
               <label className="text-sm font-medium text-gray-700 w-full sm:w-auto">
                 Min. Punktevorhersage: <span className="font-bold">{minPrediction}</span>
               </label>
@@ -117,10 +118,10 @@ function App() {
                 step="1"
                 value={minPrediction}
                 onChange={e => setMinPrediction(Number(e.target.value))}
-                className="w-full max-w-full sm:w-48 sm:max-w-none accent-blue-600"
+                className="w-full sm:w-48 accent-blue-600"
               />
             </div>
-            <div className="w-full max-w-full sm:w-auto sm:max-w-none flex-1 flex flex-col sm:flex-row sm:items-center gap-2">
+            <div className="w-full sm:w-auto flex-1 flex flex-col sm:flex-row sm:items-center gap-2">
               <label className="text-sm font-medium text-gray-700 w-full sm:w-auto">
                 Max. Marktwert: <span className="font-bold">{maxMarketValue}</span> Mio
               </label>
@@ -131,17 +132,17 @@ function App() {
                 step="0.1"
                 value={maxMarketValue}
                 onChange={e => setMaxMarketValue(Number(e.target.value))}
-                className="w-full max-w-full sm:w-48 sm:max-w-none accent-red-600"
+                className="w-full sm:w-48 accent-red-600"
               />
             </div>
           </div>
-        </div>
+        </section>
         {/* Table Container */}
-        <div className="bg-white rounded-xl shadow pt-2 pb-4 px-4 max-w-4xl w-full mx-auto">
+        <section className="bg-white rounded-2xl shadow-lg pt-4 pb-6 px-6 max-w-4xl w-full mx-auto border border-gray-200">
           {loading && <div className="text-blue-500">Lade Daten...</div>}
           {error && <div className="text-red-500">Fehler: {error}</div>}
           <div className="overflow-x-auto">
-            <table className="min-w-full border-separate border-spacing-0">
+            <table className="min-w-full border-separate border-spacing-0 font-sans">
               <thead>
                 {Array.isArray(filteredData) && filteredData.length > 0 && (
                   <tr>
@@ -151,8 +152,9 @@ function App() {
                         scope="col"
                         className={classNames(
                           j < 4
-                            ? 'sticky top-0 z-10 border-b border-gray-300 bg-white/75 py-3.5 px-3 text-left text-sm font-semibold text-gray-900 backdrop-blur-sm backdrop-filter'
-                            : 'sticky top-0 z-10 border-b border-gray-300 bg-white/75 py-3.5 px-3 text-center text-sm font-semibold text-gray-900 backdrop-blur-sm backdrop-filter',
+                            ? 'sticky top-0 z-10 border-b border-gray-300 bg-white/80 py-3.5 px-3 text-left text-sm font-semibold text-gray-900 backdrop-blur'
+                            : 'sticky top-0 z-10 border-b border-gray-300 bg-white/80 py-3.5 px-3 text-center text-sm font-semibold text-gray-900 backdrop-blur',
+                          j >= 6 && j <= 8 ? 'bg-yellow-100' : ''
                         )}
                       >
                         {cell}
@@ -172,6 +174,7 @@ function App() {
                           j < 4
                             ? 'px-3 py-3.5 text-sm whitespace-nowrap text-gray-700 text-left'
                             : 'px-3 py-3.5 text-sm whitespace-nowrap text-gray-700 text-center',
+                          j >= 6 && j <= 8 ? 'bg-yellow-50' : ''
                         )}
                       >
                         {cell}
@@ -182,9 +185,9 @@ function App() {
               </tbody>
             </table>
           </div>
-        </div>
-      </div>
-    </>
+        </section>
+      </main>
+    </div>
   )
 }
 
