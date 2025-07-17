@@ -160,7 +160,12 @@ function App() {
         
         {/* Spieler-Anzahl zwischen den Containern */}
         <div className="text-sm text-gray-600 font-medium mb-4">
-          {filteredCount} Spieler entsprechen den aktuellen Kriterien
+          {filteredCount === 0 
+            ? "Kein Spieler entspricht den aktuellen Kriterien"
+            : filteredCount === 1 
+              ? "1 Spieler entspricht den aktuellen Kriterien"
+              : `${filteredCount} Spieler entsprechen den aktuellen Kriterien`
+          }
         </div>
         
         {/* Table Container */}
