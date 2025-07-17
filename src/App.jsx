@@ -64,7 +64,7 @@ function App() {
     <>
       <div className="mt-8 flex flex-col gap-6">
         {/* Filter Container */}
-        <div className="bg-white rounded-xl shadow p-4 max-w-4xl w-full mx-auto mb-2">
+        <div className="bg-white rounded-xl shadow pt-2 pb-4 px-4 max-w-4xl w-full mx-auto mb-2">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-4">
             <div className="w-full max-w-full sm:w-auto sm:max-w-none flex-1">
               <span className="isolate flex w-full max-w-full sm:inline-flex rounded-md shadow-xs">
@@ -118,7 +118,7 @@ function App() {
           </div>
         </div>
         {/* Table Container */}
-        <div className="bg-white rounded-xl shadow p-4 max-w-4xl w-full mx-auto">
+        <div className="bg-white rounded-xl shadow pt-2 pb-4 px-4 max-w-4xl w-full mx-auto">
           {loading && <div className="text-blue-500">Lade Daten...</div>}
           {error && <div className="text-red-500">Fehler: {error}</div>}
           <div className="overflow-x-auto">
