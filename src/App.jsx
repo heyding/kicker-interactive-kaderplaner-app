@@ -100,14 +100,15 @@ function App() {
         {/* Filter Container */}
         <section className="bg-white rounded-2xl shadow-lg pt-4 pb-6 px-6 max-w-7xl w-full mx-auto mb-8 border border-gray-200">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
-            <div className="w-full sm:w-auto flex-1">
-              <span className="isolate inline-flex rounded-md shadow-sm">
+            {/* Filter Buttons - Links ausgerichtet */}
+            <div className="w-full sm:w-auto sm:flex-1 sm:flex sm:justify-start">
+              <span className="isolate flex sm:inline-flex rounded-md shadow-sm w-full sm:w-auto">
                 {FILTERS.map((filter, idx) => (
                   <button
                     key={filter}
                     type="button"
                     className={classNames(
-                      'relative inline-flex items-center px-4 py-2 text-sm font-medium ring-1 ring-inset ring-gray-300 focus:z-10 transition-colors',
+                      'relative inline-flex items-center justify-center px-4 py-2 text-sm font-medium ring-1 ring-inset ring-gray-300 focus:z-10 transition-colors flex-1 sm:flex-none',
                       idx === 0 ? 'rounded-l-md' : '-ml-px',
                       idx === FILTERS.length - 1 ? 'rounded-r-md' : '',
                       activeFilter === filter
@@ -122,8 +123,10 @@ function App() {
                 ))}
               </span>
             </div>
-            <div className="w-full sm:w-auto flex-1 flex flex-col sm:flex-row sm:items-center gap-2">
-              <label className="text-sm font-medium text-gray-700 w-full sm:w-auto">
+            
+            {/* Min. Punkte - Zentriert */}
+            <div className="w-full sm:w-auto sm:flex-1 flex flex-col sm:flex-row sm:items-center sm:justify-center gap-2">
+              <label className="text-sm font-medium text-gray-700 w-full sm:w-auto text-center sm:text-left">
                 Min. Punkte (Vorhersage): <span className="font-bold">{minPrediction}</span>
               </label>
               <input
@@ -136,8 +139,10 @@ function App() {
                 className="w-full sm:w-48 accent-red-600"
               />
             </div>
-            <div className="w-full sm:w-auto flex-1 flex flex-col sm:flex-row sm:items-center gap-2">
-              <label className="text-sm font-medium text-gray-700 w-full sm:w-auto">
+            
+            {/* Max. Marktwert - Rechts ausgerichtet */}
+            <div className="w-full sm:w-auto sm:flex-1 flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2">
+              <label className="text-sm font-medium text-gray-700 w-full sm:w-auto text-right sm:text-left">
                 Max. Marktwert: <span className="font-bold">{maxMarketValue}</span> Mio
               </label>
               <input
@@ -163,7 +168,8 @@ function App() {
           {loading && <div className="text-blue-500">Lade Daten...</div>}
           {error && <div className="text-red-500">Fehler: {error}</div>}
           <div className="overflow-x-auto">
-            <table className="min-w-full border-separate border-spacing-0 font-sans">
+            {/* Desktop/Tablet Tabelle: alle Spalten, nur ab sm sichtbar */}
+            <table className="min-w-full border-separate border-spacing-0 font-sans hidden sm:table">
               <thead>
                 {Array.isArray(filteredData) && filteredData.length > 0 && (
                   <tr>
@@ -214,6 +220,65 @@ function App() {
                         )}
                       >
                         {j === 3 ? POSITION_TRANSLATIONS[cell] || cell : cell}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {/* Mobile Tabelle: nur Spalten 2, 5, 7 (Index 1, 4, 6), nur auf xs sichtbar */}
+            <table className="min-w-full border-separate border-spacing-0 font-sans sm:hidden">
+              <thead>
+                {Array.isArray(filteredData) && filteredData.length > 0 && (
+                  <tr>
+                    {[1, 4, 6].map(j => (
+                      <th
+                        key={j}
+                        scope="col"
+                        className={classNames(
+                          j < 4
+                            ? 'sticky top-0 z-10 border-b border-gray-300 bg-white/80 py-3.5 px-3 text-left text-sm font-semibold text-gray-900 backdrop-blur'
+                            : 'sticky top-0 z-10 border-b border-gray-300 bg-white/80 py-3.5 px-3 text-center text-sm font-semibold text-gray-900 backdrop-blur',
+                          j >= 6 && j <= 8 ? 'bg-yellow-100' : '',
+                          j === 6 ? 'cursor-pointer hover:bg-gray-100' : ''
+                        )}
+                        onClick={() => j === 6 && handleSort(j)}
+                      >
+                        <div className={classNames(
+                          j < 4 ? "flex items-center justify-start" : "flex items-center justify-center"
+                        )}>
+                          {filteredData[0][j]}
+                          {j === 6 && (
+                            <span className="ml-2">
+                              {sortColumn === j ? (
+                                sortDirection === 'asc' ? '↑' : '↓'
+                              ) : (
+                                '↕'
+                              )}
+                            </span>
+                          )}
+                        </div>
+                      </th>
+                    ))}
+                  </tr>
+                )}
+              </thead>
+              <tbody>
+                {Array.isArray(filteredData) && filteredData.slice(1).map((row, i) => (
+                  <tr key={i}>
+                    {[1, 4, 6].map(j => (
+                      <td
+                        key={j}
+                        className={classNames(
+                          i !== filteredData.length - 2 ? 'border-b border-gray-200' : '',
+                          j < 4
+                            ? 'px-3 py-3.5 text-sm whitespace-nowrap text-gray-700 text-left'
+                            : 'px-3 py-3.5 text-sm whitespace-nowrap text-gray-700 text-center',
+                          j >= 6 && j <= 8 ? 'bg-yellow-50' : ''
+                        )}
+                      >
+                        {j === 3 ? POSITION_TRANSLATIONS[row[j]] || row[j] : row[j]}
                       </td>
                     ))}
                   </tr>
