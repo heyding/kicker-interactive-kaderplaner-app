@@ -2,12 +2,15 @@ import express from 'express'
 import pkg from '@googleapis/sheets'
 const google = pkg.default || pkg
 import cors from 'cors'
+import compression from 'compression'
+import crypto from 'crypto'
 import dotenv from 'dotenv'
 
 dotenv.config()
 
 const app = express()
 app.use(cors())
+app.use(compression()) // Gzip-Kompression für alle Responses
 const port = 5174
 
 // Simple In-Memory Cache
@@ -28,6 +31,11 @@ function cleanupCache() {
 // Cache-Bereinigung alle 10 Minuten
 setInterval(cleanupCache, 10 * 60 * 1000)
 
+// ETag-Generierung für Cache-Validierung
+function generateETag(data) {
+  return crypto.createHash('md5').update(JSON.stringify(data)).digest('hex')
+}
+
 app.get('/api/sheet', async (req, res) => {
   try {
     const cacheKey = 'sheet-data'
@@ -37,6 +45,17 @@ app.get('/api/sheet', async (req, res) => {
     const cachedData = cache.get(cacheKey)
     if (cachedData && (now - cachedData.timestamp) < CACHE_DURATION) {
       console.log('Cache Hit - Daten aus Cache geliefert')
+      
+      // ETag für Cache-Validierung setzen
+      const etag = generateETag(cachedData.data)
+      res.set('Cache-Control', 'public, max-age=300') // 5 Minuten
+      res.set('ETag', etag)
+      
+      // If-None-Match Header prüfen
+      if (req.headers['if-none-match'] === etag) {
+        return res.status(304).send() // Not Modified
+      }
+      
       return res.json(cachedData.data)
     }
     
@@ -68,6 +87,11 @@ app.get('/api/sheet', async (req, res) => {
       timestamp: now
     })
     
+    // HTTP-Caching-Headers und ETag setzen
+    const etag = generateETag(data)
+    res.set('Cache-Control', 'public, max-age=300') // 5 Minuten
+    res.set('ETag', etag)
+    
     console.log(`Daten erfolgreich gecacht (${data?.length || 0} Zeilen)`)
     res.json(data)
     
@@ -85,12 +109,14 @@ app.get('/api/cache-status', (req, res) => {
   if (cachedData) {
     const age = Date.now() - cachedData.timestamp
     const remainingTime = CACHE_DURATION - age
+    const etag = generateETag(cachedData.data)
     
     res.json({
       cached: true,
       age: Math.round(age / 1000) + 's',
       remainingTime: Math.round(remainingTime / 1000) + 's',
-      dataSize: cachedData.data?.length || 0
+      dataSize: cachedData.data?.length || 0,
+      etag: etag.substring(0, 8) + '...' // Kurze ETag-Anzeige
     })
   } else {
     res.json({
@@ -100,7 +126,28 @@ app.get('/api/cache-status', (req, res) => {
   }
 })
 
+// Performance-Monitoring Endpoint
+app.get('/api/health', (req, res) => {
+  const startTime = process.hrtime()
+  const memUsage = process.memoryUsage()
+  
+  res.json({
+    status: 'healthy',
+    uptime: process.uptime(),
+    memory: {
+      used: Math.round(memUsage.heapUsed / 1024 / 1024) + 'MB',
+      total: Math.round(memUsage.heapTotal / 1024 / 1024) + 'MB'
+    },
+    cache: {
+      size: cache.size,
+      duration: CACHE_DURATION / 1000 + 's'
+    }
+  })
+})
+
 app.listen(port, () => {
-  console.log(`Google Sheets Proxy mit Cache listening on http://localhost:${port}`)
-  console.log(`Cache-Dauer: ${CACHE_DURATION / 1000} Sekunden`)
+  console.log(`🚀 Google Sheets Proxy mit Optimierungen listening on http://localhost:${port}`)
+  console.log(`📊 Cache-Dauer: ${CACHE_DURATION / 1000} Sekunden`)
+  console.log(`🗜️  Gzip-Kompression: aktiviert`)
+  console.log(`🏷️  ETag-Unterstützung: aktiviert`)
 })

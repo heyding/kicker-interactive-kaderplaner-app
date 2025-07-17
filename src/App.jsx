@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo, useCallback, memo } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 
@@ -16,6 +16,51 @@ const POSITION_TRANSLATIONS = {
   'FORWARD': 'Sturm'
 }
 
+// Optimierte Table-Row-Komponente mit React.memo
+const TableRow = memo(({ row, index, isLastRow, onCellClick }) => {
+  return (
+    <tr key={index}>
+      {row.map((cell, j) => (
+        <td
+          key={j}
+          className={`
+            ${!isLastRow ? 'border-b border-gray-200' : ''}
+            ${j < 4
+              ? 'px-3 py-3.5 text-sm whitespace-nowrap text-gray-700 text-left'
+              : 'px-3 py-3.5 text-sm whitespace-nowrap text-gray-700 text-center'}
+            ${j >= 6 && j <= 8 ? 'bg-yellow-50' : ''}
+          `}
+          onClick={() => onCellClick?.(j, cell)}
+        >
+          {j === 3 ? POSITION_TRANSLATIONS[cell] || cell : cell}
+        </td>
+      ))}
+    </tr>
+  );
+});
+
+// Optimierte Mobile-Table-Row-Komponente
+const MobileTableRow = memo(({ row, index, isLastRow, visibleColumns }) => {
+  return (
+    <tr key={index}>
+      {visibleColumns.map(j => (
+        <td
+          key={j}
+          className={`
+            ${!isLastRow ? 'border-b border-gray-200' : ''}
+            ${j < 4
+              ? 'px-3 py-3.5 text-sm whitespace-nowrap text-gray-700 text-left'
+              : 'px-3 py-3.5 text-sm whitespace-nowrap text-gray-700 text-center'}
+            ${j >= 6 && j <= 8 ? 'bg-yellow-50' : ''}
+          `}
+        >
+          {j === 3 ? POSITION_TRANSLATIONS[row[j]] || row[j] : row[j]}
+        </td>
+      ))}
+    </tr>
+  );
+});
+
 function App() {
   const [count, setCount] = useState(0)
   const [sheetData, setSheetData] = useState([])
@@ -27,14 +72,52 @@ function App() {
   const [sortColumn, setSortColumn] = useState(6) // Standard: Spalte 7 (Index 6)
   const [sortDirection, setSortDirection] = useState('desc') // 'asc' oder 'desc'
 
+  // Debounce-Funktion für Performance-Optimierung
+  const debounce = useCallback((func, delay) => {
+    let timeoutId;
+    return (...args) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => func(...args), delay);
+    };
+  }, []);
+
+  // Debounced Setter für Slider-Werte
+  const [debouncedMinPrediction, setDebouncedMinPrediction] = useState(minPrediction)
+  const [debouncedMaxMarketValue, setDebouncedMaxMarketValue] = useState(maxMarketValue)
+
+  const debouncedSetMinPrediction = useCallback(
+    debounce((value) => setDebouncedMinPrediction(value), 300),
+    [debounce]
+  );
+
+  const debouncedSetMaxMarketValue = useCallback(
+    debounce((value) => setDebouncedMaxMarketValue(value), 300),
+    [debounce]
+  );
+
+  // Debounced Werte beim Slider-Change aktualisieren
   useEffect(() => {
+    debouncedSetMinPrediction(minPrediction)
+  }, [minPrediction, debouncedSetMinPrediction])
+
+  useEffect(() => {
+    debouncedSetMaxMarketValue(maxMarketValue)
+  }, [maxMarketValue, debouncedSetMaxMarketValue])
+
+  useEffect(() => {
+    const startTime = performance.now();
     setLoading(true)
+    
     fetch('http://localhost:5174/api/sheet')
       .then(res => res.json())
       .then(data => {
+        const endTime = performance.now();
+        console.log(`API Call Performance: ${Math.round(endTime - startTime)}ms`);
+        
         if (Array.isArray(data)) {
           setSheetData(data)
           setError(null)
+          console.log(`Loaded ${data.length} rows from API`);
         } else if (data && data.error) {
           setError(data.error)
           setSheetData([])
@@ -44,37 +127,44 @@ function App() {
         }
       })
       .catch(e => {
+        console.error('API Error:', e.message);
         setError(e.message)
         setSheetData([])
       })
-      .finally(() => setLoading(false))
+      .finally(() => {
+        setLoading(false)
+        const totalTime = performance.now() - startTime;
+        console.log(`Total Loading Time: ${Math.round(totalTime)}ms`);
+      })
   }, [])
 
-  // Immer nach Vorhersage (Spalte 6) absteigend sortieren
-  const filteredData = Array.isArray(sheetData) && sheetData.length > 1
-    ? [
-        sheetData[0],
-        ...sheetData.slice(1)
-          .filter(row => {
-            const position = row[3]?.toUpperCase();
-            const marketValue = parseFloat(row[4]?.replace(',', '.') || 0);
-            const prediction = parseFloat(row[6]?.replace(',', '.') || 0);
-            return (
-              position === activeFilter &&
-              prediction >= minPrediction &&
-              marketValue <= maxMarketValue
-            );
-          })
-          .sort((a, b) => {
-            const aVal = parseFloat((a[sortColumn] || '').toString().replace(',', '.'));
-            const bVal = parseFloat((b[sortColumn] || '').toString().replace(',', '.'));
-            if (isNaN(aVal) && isNaN(bVal)) return 0;
-            if (isNaN(aVal)) return 1;
-            if (isNaN(bVal)) return -1;
-            return sortDirection === 'asc' ? aVal - bVal : bVal - aVal;
-          })
-      ]
-    : sheetData
+  // Optimierte Filter-Logik mit useMemo und debounced Werten
+  const filteredData = useMemo(() => {
+    if (!Array.isArray(sheetData) || sheetData.length <= 1) return sheetData;
+    
+    return [
+      sheetData[0],
+      ...sheetData.slice(1)
+        .filter(row => {
+          const position = row[3]?.toUpperCase();
+          const marketValue = parseFloat(row[4]?.replace(',', '.') || 0);
+          const prediction = parseFloat(row[6]?.replace(',', '.') || 0);
+          return (
+            position === activeFilter &&
+            prediction >= debouncedMinPrediction &&
+            marketValue <= debouncedMaxMarketValue
+          );
+        })
+        .sort((a, b) => {
+          const aVal = parseFloat((a[sortColumn] || '').toString().replace(',', '.'));
+          const bVal = parseFloat((b[sortColumn] || '').toString().replace(',', '.'));
+          if (isNaN(aVal) && isNaN(bVal)) return 0;
+          if (isNaN(aVal)) return 1;
+          if (isNaN(bVal)) return -1;
+          return sortDirection === 'asc' ? aVal - bVal : bVal - aVal;
+        })
+    ];
+  }, [sheetData, activeFilter, debouncedMinPrediction, debouncedMaxMarketValue, sortColumn, sortDirection]);
 
   // Anzahl der Spieler, die den Filterkriterien entsprechen (ohne Header)
   const filteredCount = Array.isArray(filteredData) && filteredData.length > 1 ? filteredData.length - 1 : 0;
@@ -214,22 +304,12 @@ function App() {
               </thead>
               <tbody>
                 {Array.isArray(filteredData) && filteredData.slice(1).map((row, i) => (
-                  <tr key={i}>
-                    {row.map((cell, j) => (
-                      <td
-                        key={j}
-                        className={classNames(
-                          i !== filteredData.length - 2 ? 'border-b border-gray-200' : '',
-                          j < 4
-                            ? 'px-3 py-3.5 text-sm whitespace-nowrap text-gray-700 text-left'
-                            : 'px-3 py-3.5 text-sm whitespace-nowrap text-gray-700 text-center',
-                          j >= 6 && j <= 8 ? 'bg-yellow-50' : ''
-                        )}
-                      >
-                        {j === 3 ? POSITION_TRANSLATIONS[cell] || cell : cell}
-                      </td>
-                    ))}
-                  </tr>
+                  <TableRow
+                    key={`desktop-${i}`}
+                    row={row}
+                    index={i}
+                    isLastRow={i === filteredData.length - 2}
+                  />
                 ))}
               </tbody>
             </table>
@@ -274,22 +354,13 @@ function App() {
               </thead>
               <tbody>
                 {Array.isArray(filteredData) && filteredData.slice(1).map((row, i) => (
-                  <tr key={i}>
-                    {[1, 4, 6].map(j => (
-                      <td
-                        key={j}
-                        className={classNames(
-                          i !== filteredData.length - 2 ? 'border-b border-gray-200' : '',
-                          j < 4
-                            ? 'px-3 py-3.5 text-sm whitespace-nowrap text-gray-700 text-left'
-                            : 'px-3 py-3.5 text-sm whitespace-nowrap text-gray-700 text-center',
-                          j >= 6 && j <= 8 ? 'bg-yellow-50' : ''
-                        )}
-                      >
-                        {j === 3 ? POSITION_TRANSLATIONS[row[j]] || row[j] : row[j]}
-                      </td>
-                    ))}
-                  </tr>
+                  <MobileTableRow
+                    key={`mobile-${i}`}
+                    row={row}
+                    index={i}
+                    isLastRow={i === filteredData.length - 2}
+                    visibleColumns={[1, 4, 6]}
+                  />
                 ))}
               </tbody>
             </table>
