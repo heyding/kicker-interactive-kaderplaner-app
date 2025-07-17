@@ -62,90 +62,79 @@ function App() {
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-      <div className="mt-8">
-        <h2 className="text-xl font-bold mb-2">Google Sheet Daten</h2>
-        <div className="mb-4 flex flex-col md:flex-row md:items-center gap-4">
-          <span className="isolate inline-flex rounded-md shadow-xs">
-            {FILTERS.map((filter, idx) => (
-              <button
-                key={filter}
-                type="button"
-                className={
-                  `relative inline-flex items-center px-3 py-2 text-sm font-semibold ring-1 ring-gray-300 ring-inset focus:z-10 ` +
-                  (idx === 0 ? 'rounded-l-md ' : '-ml-px ')
-                  + (idx === FILTERS.length - 1 ? 'rounded-r-md ' : '')
-                  + (activeFilter === filter
-                      ? 'bg-red-600 text-white'
-                      : 'bg-white text-gray-900 hover:bg-gray-50')
-                }
-                onClick={() => setActiveFilter(filter)}
-              >
-                {filter.charAt(0) + filter.slice(1).toLowerCase()}
-              </button>
-            ))}
-          </span>
-          <div className="flex flex-col items-start gap-2">
-            <label className="text-sm font-medium text-gray-700">
-              Min. Punktevorhersage: <span className="font-bold">{minPrediction}</span>
-            </label>
-            <input
-              type="range"
-              min="0"
-              max="350"
-              step="1"
-              value={minPrediction}
-              onChange={e => setMinPrediction(Number(e.target.value))}
-              className="w-48 accent-blue-600"
-            />
-          </div>
-          <div className="flex flex-col items-start gap-2">
-            <label className="text-sm font-medium text-gray-700">
-              Max. Marktwert: <span className="font-bold">{maxMarketValue}</span> Mio
-            </label>
-            <input
-              type="range"
-              min="0.5"
-              max="8.5"
-              step="0.1"
-              value={maxMarketValue}
-              onChange={e => setMaxMarketValue(Number(e.target.value))}
-              className="w-48 accent-red-600"
-            />
+      <div className="mt-8 flex flex-col gap-6">
+        {/* Filter Container */}
+        <div className="bg-white rounded-xl shadow p-4 max-w-4xl w-full mx-auto mb-2">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-4">
+            <div className="w-full max-w-full sm:w-auto sm:max-w-none flex-1">
+              <span className="isolate flex w-full max-w-full sm:inline-flex rounded-md shadow-xs">
+                {FILTERS.map((filter, idx) => (
+                  <button
+                    key={filter}
+                    type="button"
+                    className={
+                      `relative inline-flex items-center justify-center w-full max-w-full sm:w-auto sm:max-w-none px-3 py-2 text-sm font-semibold ring-1 ring-gray-300 ring-inset focus:z-10 ` +
+                      (idx === 0 ? 'rounded-l-md ' : '-ml-px ')
+                      + (idx === FILTERS.length - 1 ? 'rounded-r-md ' : '')
+                      + (activeFilter === filter
+                          ? 'bg-red-600 text-white'
+                          : 'bg-white text-gray-900 hover:bg-gray-50')
+                    }
+                    onClick={() => setActiveFilter(filter)}
+                  >
+                    {filter.charAt(0) + filter.slice(1).toLowerCase()}
+                  </button>
+                ))}
+              </span>
+            </div>
+            <div className="w-full max-w-full sm:w-auto sm:max-w-none flex-1 flex flex-col sm:flex-row sm:items-center gap-2">
+              <label className="text-sm font-medium text-gray-700 w-full sm:w-auto">
+                Min. Punktevorhersage: <span className="font-bold">{minPrediction}</span>
+              </label>
+              <input
+                type="range"
+                min="0"
+                max="350"
+                step="1"
+                value={minPrediction}
+                onChange={e => setMinPrediction(Number(e.target.value))}
+                className="w-full max-w-full sm:w-48 sm:max-w-none accent-blue-600"
+              />
+            </div>
+            <div className="w-full max-w-full sm:w-auto sm:max-w-none flex-1 flex flex-col sm:flex-row sm:items-center gap-2">
+              <label className="text-sm font-medium text-gray-700 w-full sm:w-auto">
+                Max. Marktwert: <span className="font-bold">{maxMarketValue}</span> Mio
+              </label>
+              <input
+                type="range"
+                min="0.5"
+                max="8.5"
+                step="0.1"
+                value={maxMarketValue}
+                onChange={e => setMaxMarketValue(Number(e.target.value))}
+                className="w-full max-w-full sm:w-48 sm:max-w-none accent-red-600"
+              />
+            </div>
           </div>
         </div>
-        {loading && <div className="text-blue-500">Lade Daten...</div>}
-        {error && <div className="text-red-500">Fehler: {error}</div>}
-        <table className="min-w-full border text-sm">
-          <tbody>
-            {Array.isArray(filteredData) && filteredData.map((row, i) => (
-              <tr key={i} className="border-b">
-                {row.map((cell, j) => (
-                  <td key={j} className="px-2 py-1 border-r">{cell}</td>
+        {/* Table Container */}
+        <div className="bg-white rounded-xl shadow p-4 max-w-4xl w-full mx-auto">
+          {loading && <div className="text-blue-500">Lade Daten...</div>}
+          {error && <div className="text-red-500">Fehler: {error}</div>}
+          <div className="overflow-x-auto">
+            <table className="min-w-full border text-sm">
+              <tbody>
+                {Array.isArray(filteredData) && filteredData.map((row, i) => (
+                  <tr key={i} className="border-b">
+                    {row.map((cell, j) => (
+                      <td key={j} className="px-2 py-1 border-r">{cell}</td>
+                    ))}
+                  </tr>
                 ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </>
   )
