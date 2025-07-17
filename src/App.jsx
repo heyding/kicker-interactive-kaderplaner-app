@@ -62,6 +62,12 @@ function App() {
 
   // Anzahl der Spieler, die den Filterkriterien entsprechen (ohne Header)
   const filteredCount = Array.isArray(filteredData) && filteredData.length > 1 ? filteredData.length - 1 : 0;
+
+  // Hilfsfunktion für dynamische Klassen
+  function classNames(...classes) {
+    return classes.filter(Boolean).join(' ')
+  }
+
   return (
     <>
       <div className="mt-8 flex flex-col gap-6">
@@ -127,12 +133,35 @@ function App() {
           {loading && <div className="text-blue-500">Lade Daten...</div>}
           {error && <div className="text-red-500">Fehler: {error}</div>}
           <div className="overflow-x-auto">
-            <table className="min-w-full border text-sm">
+            <table className="min-w-full border-separate border-spacing-0">
+              <thead>
+                {Array.isArray(filteredData) && filteredData.length > 0 && (
+                  <tr>
+                    {filteredData[0].map((cell, j) => (
+                      <th
+                        key={j}
+                        scope="col"
+                        className="sticky top-0 z-10 border-b border-gray-300 bg-white/75 py-3.5 px-3 text-left text-sm font-semibold text-gray-900 backdrop-blur-sm backdrop-filter"
+                      >
+                        {cell}
+                      </th>
+                    ))}
+                  </tr>
+                )}
+              </thead>
               <tbody>
-                {Array.isArray(filteredData) && filteredData.map((row, i) => (
-                  <tr key={i} className="border-b">
+                {Array.isArray(filteredData) && filteredData.slice(1).map((row, i) => (
+                  <tr key={i}>
                     {row.map((cell, j) => (
-                      <td key={j} className="px-2 py-1 border-r">{cell}</td>
+                      <td
+                        key={j}
+                        className={classNames(
+                          i !== filteredData.length - 2 ? 'border-b border-gray-200' : '',
+                          'px-3 py-3.5 text-sm whitespace-nowrap text-gray-700',
+                        )}
+                      >
+                        {cell}
+                      </td>
                     ))}
                   </tr>
                 ))}
