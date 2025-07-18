@@ -175,6 +175,42 @@ npm run preview
      build_command: npm run build
    ```
 
+## 🚀 Deployment Status
+
+### ✅ **Erfolgreich behoben (18. Juli 2025)**
+
+1. **Port-Konfiguration**: Server läuft jetzt auf Port 8080 für Digital Ocean
+2. **SPA-Routing**: Catch-all Route funktioniert mit `app.use()` statt `app.get('*')`
+3. **Statische Dateien**: Frontend wird korrekt aus `dist/` serviert
+4. **API-Integration**: Alle Endpunkte funktionieren einwandfrei
+
+### 🔄 **Deployment-Schritte**
+```bash
+# 1. Code committen
+git add .
+git commit -m "Fix SPA routing and Digital Ocean port configuration"
+git push origin main
+
+# 2. In Digital Ocean wird automatisch deployed
+# 3. Health Checks sollten jetzt erfolgreich sein
+# 4. App ist unter der Digital Ocean URL erreichbar
+```
+
+### 📋 **Changelog**
+
+**v1.1.0** (18. Juli 2025)
+- 🐛 Fix: "Cannot GET /" Error durch korrektes SPA-Routing
+- 🐛 Fix: Digital Ocean Health Check durch Port 8080 Konfiguration
+- ✨ Feature: Robuste Error-Handling für fehlende Frontend-Dateien
+- 🔧 Improvement: Debug-Logging für bessere Fehlerdiagnose
+
+**v1.0.0** (Initial Release)
+- ✨ Vite + React + Tailwind CSS Setup
+- ✨ Google Sheets API Integration
+- ✨ Responsive Tabelle mit Filtern
+- ✨ Caching und Performance-Optimierungen
+- ✨ Service Worker für Offline-Support
+
 ## 🔧 Troubleshooting
 
 ### Digital Ocean Health Check Error
@@ -187,6 +223,17 @@ npm run preview
 - Backend bindet an `0.0.0.0` statt `localhost`
 - Frontend nutzt relative API-Pfade (`/api/sheet`)
 - Vite-Proxy konfiguriert für lokale Entwicklung
+
+### "Cannot GET /" Error
+**Problem**: `Cannot GET /` beim Aufruf der Root-URL
+
+**Lösung**: Express-Router hatte Probleme mit `app.get('*', ...)` Syntax. Geändert zu `app.use(...)` für robuste SPA-Routing.
+
+**Wichtige Änderungen**:
+- Catch-all Route: `app.get('*', ...)` → `app.use(...)`
+- Statische Dateien werden aus `dist/` serviert
+- SPA-Routing funktioniert für alle Frontend-Routen
+- Fallback auf `index.html` für unbekannte Routen
 
 ### Environment Variables
 Stelle sicher, dass alle `VITE_GSHEET_*` Variablen in Digital Ocean konfiguriert sind:
@@ -270,6 +317,41 @@ curl http://localhost:8080/api/cache-status
 # Health Check
 curl http://localhost:8080/api/health
 ```
+
+### Production Testing
+```bash
+# Lokaler Build-Test
+npm run build
+npm start
+
+# Test Root-Route
+curl http://localhost:8080/
+
+# Test API
+curl http://localhost:8080/api/sheet
+
+# Test SPA-Routing
+curl http://localhost:8080/some-route
+```
+
+### Häufige Probleme
+
+**1. "Cannot GET /" Error**
+- Prüfe ob `dist/` Ordner existiert: `ls -la dist/`
+- Führe Build aus: `npm run build`
+- Starte Server neu: `npm start`
+
+**2. API-Daten werden nicht geladen**
+- Prüfe Environment Variables in `.env`
+- Teste API direkt: `curl http://localhost:8080/api/sheet`
+- Prüfe Google Sheets Berechtigung
+
+**3. Health Check Fehler**
+- Server muss auf Port 8080 laufen (Digital Ocean)
+- Backend bindet an `0.0.0.0` nicht `localhost`
+- Environment Variable `PORT` wird automatisch gesetzt
+
+## 📞 Support
 
 ### Production
 ```bash
