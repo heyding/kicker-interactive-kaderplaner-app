@@ -5,12 +5,27 @@ import cors from 'cors'
 import compression from 'compression'
 import crypto from 'crypto'
 import dotenv from 'dotenv'
+import path from 'path'
+import { fileURLToPath } from 'url'
+import fs from 'fs'
 
 dotenv.config()
 
 const app = express()
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
 app.use(cors())
 app.use(compression()) // Gzip-Kompression für alle Responses
+
+// Prüfen ob dist-Verzeichnis existiert
+const distPath = path.join(__dirname, 'dist')
+if (fs.existsSync(distPath)) {
+  console.log('📁 Statische Dateien aus dist-Ordner werden serviert')
+  app.use(express.static(distPath))
+} else {
+  console.log('⚠️  Warnung: dist-Ordner nicht gefunden. Führe "npm run build" aus.')
+}
 
 // Simple In-Memory Cache
 const cache = new Map()
@@ -142,6 +157,31 @@ app.get('/api/health', (req, res) => {
       duration: CACHE_DURATION / 1000 + 's'
     }
   })
+})
+
+// Catch-all Route für SPA - muss nach allen API-Routen kommen
+app.use((req, res) => {
+  const indexPath = path.join(__dirname, 'dist', 'index.html')
+  console.log(`Anfrage für: ${req.path}`)
+  console.log(`Index-Pfad: ${indexPath}`)
+  console.log(`Existiert: ${fs.existsSync(indexPath)}`)
+  
+  if (fs.existsSync(indexPath)) {
+    res.sendFile(indexPath)
+  } else {
+    res.status(404).send(`
+      <h1>Build-Fehler</h1>
+      <p>Die Frontend-Dateien wurden nicht gefunden.</p>
+      <p>Suchpfad: ${indexPath}</p>
+      <p>Führe <code>npm run build</code> aus, um die Dateien zu erstellen.</p>
+      <p>API-Endpunkte sind verfügbar unter:</p>
+      <ul>
+        <li><a href="/api/sheet">/api/sheet</a></li>
+        <li><a href="/api/health">/api/health</a></li>
+        <li><a href="/api/cache-status">/api/cache-status</a></li>
+      </ul>
+    `)
+  }
 })
 
 // Server starten
