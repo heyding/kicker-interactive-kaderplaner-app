@@ -28,6 +28,14 @@ export default defineConfig({
     // HMR-Performance verbessern
     hmr: {
       overlay: false
+    },
+    // API-Proxy für Entwicklung
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+        secure: false
+      }
     }
   },
   // Dependency Pre-bundling optimieren

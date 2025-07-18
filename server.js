@@ -11,7 +11,6 @@ dotenv.config()
 const app = express()
 app.use(cors())
 app.use(compression()) // Gzip-Kompression für alle Responses
-const port = 5174
 
 // Simple In-Memory Cache
 const cache = new Map()
@@ -145,8 +144,10 @@ app.get('/api/health', (req, res) => {
   })
 })
 
-app.listen(port, () => {
-  console.log(`🚀 Google Sheets Proxy mit Optimierungen listening on http://localhost:${port}`)
+// Server starten
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Google Sheets Proxy mit Optimierungen listening on http://0.0.0.0:${PORT}`)
   console.log(`📊 Cache-Dauer: ${CACHE_DURATION / 1000} Sekunden`)
   console.log(`🗜️  Gzip-Kompression: aktiviert`)
   console.log(`🏷️  ETag-Unterstützung: aktiviert`)

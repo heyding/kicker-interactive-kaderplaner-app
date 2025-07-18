@@ -65,7 +65,8 @@ npm run dev
 npm run server
 
 # App öffnet sich auf http://localhost:5173/
-# API läuft auf http://localhost:5174/
+# Frontend: http://localhost:5173/
+# Backend: http://localhost:8080/ (oder process.env.PORT)
 ```
 
 ### Production Build
@@ -174,6 +175,30 @@ npm run preview
      build_command: npm run build
    ```
 
+## 🔧 Troubleshooting
+
+### Digital Ocean Health Check Error
+**Problem**: `ERROR failed health checks after 13 attempts with error Readiness probe failed: dial tcp 10.244.12.129:8080: connect: connection refused`
+
+**Lösung**: Digital Ocean erwartet, dass die App auf Port 8080 läuft. Das Backend verwendet automatisch `process.env.PORT` (von Digital Ocean gesetzt) oder als Fallback Port 8080.
+
+**Wichtige Änderungen**:
+- Backend hört auf `process.env.PORT || 8080`
+- Backend bindet an `0.0.0.0` statt `localhost`
+- Frontend nutzt relative API-Pfade (`/api/sheet`)
+- Vite-Proxy konfiguriert für lokale Entwicklung
+
+### Environment Variables
+Stelle sicher, dass alle `VITE_GSHEET_*` Variablen in Digital Ocean konfiguriert sind:
+- `VITE_GSHEET_TYPE`
+- `VITE_GSHEET_PROJECT_ID`  
+- `VITE_GSHEET_PRIVATE_KEY_ID`
+- `VITE_GSHEET_PRIVATE_KEY`
+- `VITE_GSHEET_CLIENT_EMAIL`
+- `VITE_GSHEET_CLIENT_ID`
+- `VITE_GSHEET_SPREADSHEET_ID`
+- `VITE_GSHEET_RANGE`
+
 ## 🔍 API Endpoints
 
 ### Backend API
@@ -240,10 +265,10 @@ export default {
 DEBUG=true npm run dev
 
 # Cache Status prüfen
-curl http://localhost:5174/api/cache-status
+curl http://localhost:8080/api/cache-status
 
 # Health Check
-curl http://localhost:5174/api/health
+curl http://localhost:8080/api/health
 ```
 
 ### Production

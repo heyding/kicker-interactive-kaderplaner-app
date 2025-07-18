@@ -108,7 +108,7 @@ function App() {
     const startTime = performance.now();
     setLoading(true)
     
-    fetch('http://localhost:5174/api/sheet')
+    fetch('/api/sheet')
       .then(res => res.json())
       .then(data => {
         const endTime = performance.now();
