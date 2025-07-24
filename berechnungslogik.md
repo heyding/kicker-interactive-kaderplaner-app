@@ -6,8 +6,8 @@ Die **Expected_Points_Kicker** werden aus den Saison Vorhersagedaten von Kickbas
 ## Datengrundlage
 
 ### Eingangswerte
-- **Expected_Points_Kickbase**: Erwartete Punkte aus dem Kickbase-System
-- **Expected_Points_Sorare**: Erwartete Punkte aus dem Sorare-System
+- **Expected_Points_Kickbase**: Erwartete Punkte aus der LI Kickbase-Saisonranking Vorhersage
+- **Expected_Points_Sorare**: Erwartete Punkte aus der LI Sorare-Saisonranking Vorhersage
 - **Position**: Spielerposition (FORWARD, MIDFIELDER, DEFENDER, GOALKEEPER)
 
 ### Datenvalidierung
