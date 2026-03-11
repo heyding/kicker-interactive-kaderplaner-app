@@ -1,6 +1,4 @@
-import { useEffect, useState, useMemo, useCallback, memo } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { memo, useCallback, useEffect, useMemo, useState } from 'react'
 
 const FILTERS = [
   'GOALKEEPER',
@@ -107,13 +105,13 @@ function App() {
   useEffect(() => {
     const startTime = performance.now();
     setLoading(true)
-    
-    fetch('/api/sheet')
+
+    fetch(import.meta.env.BASE_URL + 'data.json')
       .then(res => res.json())
       .then(data => {
         const endTime = performance.now();
-        console.log(`API Call Performance: ${Math.round(endTime - startTime)}ms`);
-        
+        console.log(`Data Load Performance: ${Math.round(endTime - startTime)}ms`);
+
         if (Array.isArray(data)) {
           setSheetData(data)
           setError(null)
@@ -141,7 +139,7 @@ function App() {
   // Optimierte Filter-Logik mit useMemo und debounced Werten
   const filteredData = useMemo(() => {
     if (!Array.isArray(sheetData) || sheetData.length <= 1) return sheetData;
-    
+
     return [
       sheetData[0],
       ...sheetData.slice(1)
@@ -213,7 +211,7 @@ function App() {
                 ))}
               </span>
             </div>
-            
+
             {/* Min. Punkte - Zentriert */}
             <div className="w-full sm:w-auto sm:flex-1 flex flex-col sm:flex-row sm:items-center sm:justify-center gap-2">
               <label className="text-sm font-medium text-gray-700 w-full sm:w-auto text-center sm:text-left">
@@ -229,7 +227,7 @@ function App() {
                 className="w-full sm:w-48 accent-red-600"
               />
             </div>
-            
+
             {/* Max. Marktwert - Rechts ausgerichtet */}
             <div className="w-full sm:w-auto sm:flex-1 flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2">
               <label className="text-sm font-medium text-gray-700 w-full sm:w-auto text-right sm:text-left">
@@ -247,17 +245,17 @@ function App() {
             </div>
           </div>
         </section>
-        
+
         {/* Spieler-Anzahl zwischen den Containern */}
         <div className="text-sm text-gray-600 font-medium mb-4">
-          {filteredCount === 0 
+          {filteredCount === 0
             ? "Kein Spieler entspricht den aktuellen Kriterien"
-            : filteredCount === 1 
+            : filteredCount === 1
               ? "1 Spieler entspricht den aktuellen Kriterien"
               : `${filteredCount} Spieler entsprechen den aktuellen Kriterien`
           }
         </div>
-        
+
         {/* Table Container */}
         <section className="bg-white rounded-2xl shadow-lg pt-4 pb-8 px-6 max-w-7xl w-full mx-auto border border-gray-200 mb-8">
           {loading && <div className="text-blue-500">Lade Daten...</div>}

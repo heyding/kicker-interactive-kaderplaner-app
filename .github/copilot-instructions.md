@@ -3,5 +3,7 @@
 - This is a Vite + React + Tailwind CSS project.
 - Use Tailwind UI components for UI.
 - The app will use the Google Sheets API (Service Account) as a database.
-- The app is intended for deployment on Digital Ocean.
+- The app is hosted on GitHub Pages (static site) and deployed via GitHub Actions.
+- Google Sheets data is fetched at build time (scripts/fetch-data.js) and served as static JSON.
+- Google Sheets credentials are stored as GitHub Secrets, not exposed to the client.
 - Use best practices for React, Tailwind, and Google Sheets API integration.

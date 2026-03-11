@@ -29,6 +29,9 @@ coverage
 out-tsc
 temp
 
+# Build-time generated data
+public/data.json
+
 # Environment files
 .env
 .env.local

@@ -1,0 +1,61 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  # Allows manual triggering to refresh data
+  workflow_dispatch:
+  # Optional: schedule to refresh Google Sheets data periodically
+  # schedule:
+  #   - cron: '0 6 * * *'  # Daily at 06:00 UTC
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Fetch Google Sheets data
+        run: node scripts/fetch-data.js
+        env:
+          VITE_GSHEET_TYPE: ${{ secrets.VITE_GSHEET_TYPE }}
+          VITE_GSHEET_PROJECT_ID: ${{ secrets.VITE_GSHEET_PROJECT_ID }}
+          VITE_GSHEET_PRIVATE_KEY_ID: ${{ secrets.VITE_GSHEET_PRIVATE_KEY_ID }}
+          VITE_GSHEET_PRIVATE_KEY: ${{ secrets.VITE_GSHEET_PRIVATE_KEY }}
+          VITE_GSHEET_CLIENT_EMAIL: ${{ secrets.VITE_GSHEET_CLIENT_EMAIL }}
+          VITE_GSHEET_CLIENT_ID: ${{ secrets.VITE_GSHEET_CLIENT_ID }}
+          VITE_GSHEET_SPREADSHEET_ID: ${{ secrets.VITE_GSHEET_SPREADSHEET_ID }}
+          VITE_GSHEET_RANGE: ${{ secrets.VITE_GSHEET_RANGE }}
+
+      - name: Build
+        run: npm run build
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
